@@ -1,0 +1,112 @@
+  METHOD /iwbep/if_mgw_appl_srv_runtime~get_stream.
+    DATA(lv_key_tab) = VALUE #( it_key_tab[ 1 ]-value ).
+    DATA(lv_vbeln) = VALUE vbeln( ).
+    lv_vbeln = lv_key_tab.
+    DATA: lv_fm_name   TYPE rs38l_fnam,
+          ls_cntl_prmt TYPE ssfctrlop,
+          ls_op_opt    TYPE ssfcompop,
+          ls_ssfcrescl TYPE ssfcrescl.
+
+    CALL FUNCTION 'SSF_FUNCTION_MODULE_NAME'
+      EXPORTING
+        formname           = 'ZRAP_TEST'
+*       VARIANT            = ' '
+*       DIRECT_CALL        = ' '
+      IMPORTING
+        fm_name            = lv_fm_name
+      EXCEPTIONS
+        no_form            = 1
+        no_function_module = 2
+        OTHERS             = 3.
+
+    IF sy-subrc <> 0.
+* Implement suitable error handling here
+    ENDIF.
+    ls_cntl_prmt-langu  = 'EN'.
+    ls_cntl_prmt-getotf = abap_true.
+    ls_cntl_prmt-preview = space.
+    ls_cntl_prmt-no_dialog = abap_true.
+
+    ls_op_opt-tddest    = 'LOCL'.
+    ls_op_opt-xdfcmode  = abap_true.
+    ls_op_opt-tdnewid   = abap_true.
+    ls_op_opt-tdimmed   = abap_true.
+
+    CALL FUNCTION lv_fm_name "'/1BCDWB/SF00002069'
+      EXPORTING
+        control_parameters = ls_cntl_prmt
+        output_options     = ls_op_opt
+        user_settings      = 'X'
+        p_vbeln            = lv_vbeln
+      IMPORTING
+*       DOCUMENT_OUTPUT_INFO       =
+        job_output_info    = ls_ssfcrescl
+*       JOB_OUTPUT_OPTIONS =
+      EXCEPTIONS
+        formatting_error   = 1
+        internal_error     = 2
+        send_error         = 3
+        user_canceled      = 4
+        OTHERS             = 5.
+    IF sy-subrc <> 0.
+* Implement suitable error handling here
+    ENDIF.
+    DATA: lt_otf      TYPE TABLE OF itcoo,
+          lv_bin_file TYPE xstring,
+          lt_lines    TYPE TABLE OF tline,
+          gs_stream   TYPE ty_s_media_resource.
+    REFRESH lt_otf[].
+    lt_otf[] = ls_ssfcrescl-otfdata[].
+    CLEAR : lv_bin_file.
+    CALL FUNCTION 'CONVERT_OTF'
+      EXPORTING
+        format                = 'PDF'
+      IMPORTING
+        bin_file              = lv_bin_file
+      TABLES
+        otf                   = lt_otf
+        lines                 = lt_lines
+      EXCEPTIONS
+        err_max_linewidth     = 1
+        err_format            = 2
+        err_conv_not_possible = 3
+        err_bad_otf           = 4
+        OTHERS                = 5.
+    IF sy-subrc <> 0.
+      RETURN.
+    ENDIF.
+
+    gs_stream-mime_type = 'application/pdf'.
+    gs_stream-value     = lv_bin_file.
+*
+
+    DATA: ls_stream   TYPE ty_s_media_resource, " Standard media resource structure
+          ls_header   TYPE ihttpnvp,              " Name-value pair structure for HTTP
+          lv_filename TYPE string.
+    lv_filename  = |SalesOrder_{ lv_vbeln }.pdf|.
+    " 1. [Your custom logic here to fetch file content and mime type]
+    " Example:
+    " lv_filename         = 'Invoicedoc.pdf'.
+    " ls_stream-mime_type = 'application/pdf'.
+    " ls_stream-value     = lv_pdf_xstring_content.
+
+    " 2. Handle URL-encoding for spaces or special characters in the filename
+    DATA(lv_encoded_filename) = cl_http_utility=>if_http_utility~escape_url( unescaped = lv_filename ).
+
+    " 3. Fix standard filename dots being replaced during URL encoding (optional safety step)
+    REPLACE ALL OCCURRENCES OF '%2e' IN lv_encoded_filename WITH '.'.
+
+    " 4. Set up the Content-Disposition Header
+    ls_header-name  = 'Content-Disposition'.
+
+    " Use 'attachment' to force download, or 'inline' to attempt viewing in-browser
+    ls_header-value = |attachment; filename="{ lv_encoded_filename }";|.
+
+    " 5. Inject the header into the Gateway client response context
+    set_header( is_header = ls_header ).
+    CALL METHOD me->copy_data_to_ref
+      EXPORTING
+        is_data = gs_stream
+      CHANGING
+        cr_data = er_stream.
+  ENDMETHOD.

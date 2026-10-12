@@ -1,0 +1,116 @@
+managed implementation in class zbp_i_file_data_so unique;
+strict ( 2 );
+with draft;
+define behavior for ZI_FILE_DATA_SO alias User
+persistent table zsdt_file_table
+draft table zsdt_file_tab_d
+lock master total etag last_changed_at
+authorization master ( global )
+etag master local_last_changed_at
+{
+  create;
+  update ( features : instance );
+  delete ( features : instance );
+  field ( numbering : managed ) uuid;
+  field ( readonly ) uuid, last_changed_at, vbeln;
+  field ( readonly ) local_created_by, local_last_changed_at;
+  association _UserSo { create ( features : instance ); with draft; }
+  association _SOLog { create ( features : instance ); with draft; }
+  action ( features : instance ) PostSO result [1] $self;
+  // Logic to read excel data into associated entity ZI_2123_User_Dev
+  action ( features : instance ) uploadExcelData result [1] $self;
+  // Logic to download excel template
+  action ( features : instance ) DownloadExcel result [1] $self;
+  // Change File Status During Creation of new record
+  determination FillFileStatus on modify { field uuid; }
+  // Change File Status When file is selected
+  determination FillSelectedStatus on modify { field attachment; }
+  // copy existing row
+  //  factory action copyRecord [1]; // by default its instance bound
+  // for reloading ui after data has been uploaded
+  side effects
+  {
+    field Attachment affects field file_status;
+    action uploadExcelData affects $self, field _UserSo.*, entity _UserSo;
+  }
+
+  draft action Activate optimized;
+  draft action Discard;
+  draft action Edit;
+  draft action Resume;
+  draft determine action Prepare;
+  mapping for zsdt_file_table
+    {
+      uuid                  = uuid;
+      vbeln                 = vbeln;
+      descripition          = descripition;
+      attachment            = attachment;
+      mimetype              = mimetype;
+      filename              = filename;
+      file_status           = file_status;
+      template_status       = template_status;
+      Criticality           = criticality;
+      SalesOrderCriticality = SalesOrderCriticality;
+      TemplateCrticality    = templatecrticality;
+      ShowPDF               = showpdf;
+      LinkToPDF             = linktopdf;
+      local_created_by      = local_created_by;
+      local_created_at      = local_created_at;
+      local_last_changed_by = local_last_changed_by;
+      local_last_changed_at = local_last_changed_at;
+      last_changed_at       = last_changed_at;
+    }
+}
+
+define behavior for ZI_FILE_DT_SO alias UserSo
+persistent table zsdt_sales_ord
+draft table zsdt_sales_ord_d
+lock dependent by _User
+authorization dependent by _User
+//etag master <field_name>
+{
+  update ( features : instance );
+  delete ( features : instance );
+  field ( readonly ) uuid, serialno;
+  association _User { with draft; }
+  mapping for zsdt_sales_ord
+    {
+      uuid     = uuid;
+      serialno = serialno;
+      auart    = auart;
+      kunnr    = kunnr;
+      vkorg    = vkorg;
+      vtweg    = vtweg;
+      spart    = spart;
+      matnr    = matnr;
+      werks    = werks;
+      lgort    = lgort;
+      kwmeng   = kwmeng;
+      vrkme    = vrkme;
+    }
+}
+define behavior for ZI_SO_LOG alias SOLog
+persistent table zsdt_so_log
+draft table zsdt_so_log_d
+lock dependent by _User
+authorization dependent by _User
+{
+  update( features : instance );
+  delete( features : instance );
+  field ( numbering : managed ) Itemuuid;
+  field ( readonly ) uuid, Itemuuid,Type,Msg;
+  association _User { with draft; }
+  mapping for zsdt_so_log
+    {
+      uuid               = uuid;
+      Itemuuid           = Itemuuid;
+      Type               = Type;
+      Msg                = Msg;
+      Msgcr              = Msgcr;
+      localcreatedby     = Local_Created_By;
+      LocalCreatedAt     = Local_Created_At;
+      LocalLastChangedBy = Local_Last_Changed_By;
+      LocalLastChangedAt = Local_Last_Changed_At;
+      LastChangedAt      = Last_Changed_At;
+    }
+}

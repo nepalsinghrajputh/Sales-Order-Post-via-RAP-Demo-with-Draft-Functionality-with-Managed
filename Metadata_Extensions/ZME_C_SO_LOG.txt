@@ -1,0 +1,58 @@
+@Metadata.layer: #CORE
+@UI.headerInfo : {
+ typeName: 'SO Logs',
+ typeNamePlural: 'SO Logs',
+ title: {
+        type: #STANDARD,
+        label: 'UUID',
+        value: 'Itemuuid' // this will display as Header title
+    }
+// description : { value: '' } //this will be dispalyed below header title
+}
+annotate entity ZC_SO_LOG
+    with 
+{
+  @UI.facet: [
+    {
+    purpose: #STANDARD,
+    type: #IDENTIFICATION_REFERENCE ,
+    label: 'Log Details',
+    position: 10
+    }]
+@UI: {
+  lineItem: [
+    {
+      position: 10,
+      label: 'Status',
+      criticality: 'Msgcr'
+    }
+  ],
+  identification: [
+    {
+      position: 10,
+      label: 'Status',
+      criticality: 'Msgcr'
+    }
+  ]
+}
+Type;
+//@UI.lineItem: [
+//  {
+//    position: 11,
+//    label: 'Status Icon'
+//  }
+//]
+//StatusIcon;
+  @UI:{lineItem: [{position: 20,importance: #HIGH , label: 'Message',criticality: 'Msgcr' } ],
+  identification: [{ position: 20 , label: 'Message',criticality: 'Msgcr'}]
+    }
+Msg;   
+  @UI:{lineItem: [{position: 30,importance: #HIGH , label: 'Created At',criticality: 'Msgcr' } ],
+  identification: [{ position: 30 , label: 'Created At',criticality: 'Msgcr'}]
+    } 
+LocalCreatedAt;
+  @UI:{lineItem: [{position: 40,importance: #HIGH , label: 'Created By' ,criticality: 'Msgcr'} ],
+  identification: [{ position: 40 , label: 'Created By',criticality: 'Msgcr'}]
+    } 
+LocalCreatedBy;
+}

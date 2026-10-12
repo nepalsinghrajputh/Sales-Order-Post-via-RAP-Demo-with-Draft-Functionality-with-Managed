@@ -1,0 +1,74 @@
+@Metadata.layer: #CORE
+@UI.headerInfo : {
+ typeName: 'Excel File data',
+ typeNamePlural: 'Excel File data',
+ title: {
+        type: #STANDARD,
+        label: 'UUID',
+        value: 'uuid' // this will display as Header title
+    }
+// description : { value: '' } //this will be dispalyed below header title
+}
+annotate entity ZC_FILE_DT_SO with
+{
+
+
+  @UI.facet: [
+    {
+    purpose: #STANDARD,
+    type: #IDENTIFICATION_REFERENCE ,
+    label: 'So Details',
+    position: 10
+    }]
+  @UI:{lineItem: [{position: 10,importance: #HIGH , label: 'UUID' } ],
+  identification: [{ position: 10 , label: 'UUID'}]
+    }
+  @EndUserText.label: 'UUID'
+  uuid;
+  @UI:{lineItem: [{position: 20,importance: #HIGH , label: 'Serial No' } ],
+  identification: [{ position: 20 , label: 'Serial No'}]
+    }
+  serialno;
+  @UI:{lineItem: [{position: 30,importance: #HIGH , label: 'Document type'} ],
+  identification: [{ position: 30 , label: 'Document Type'}]
+    }
+  auart;
+  @UI:{lineItem: [{position: 40,importance: #HIGH , label: 'Customer'} ],
+  identification: [{ position: 40 , label: 'Customer'}]
+    }
+  kunnr;
+  @UI:{lineItem: [{position: 50,importance: #HIGH , label: 'Sales Org'} ],
+  identification: [{ position: 50 , label: 'Sales Org'}]
+    }
+  vkorg;
+  @UI:{lineItem: [{position: 60,importance: #HIGH , label: 'Distribution Channel'} ],
+  identification: [{ position: 60 , label: 'Distribution Channel'}]
+    }
+  vtweg;
+  @UI:{lineItem: [{position: 70,importance: #HIGH , label: 'Division'} ],
+  identification: [{ position: 70 , label: 'Division'}]
+    }
+  spart;
+  @UI:{lineItem: [{position: 80,importance: #HIGH , label: 'Material No' } ],
+  identification: [{ position: 80 , label: 'Material No'}]
+    }
+  matnr;
+  @UI:{lineItem: [{position: 90,importance: #HIGH , label: 'Plant'} ],
+  identification: [{ position: 90 , label: 'Plant'}]
+    }
+  werks;
+  @UI:{lineItem: [{position: 100,importance: #HIGH , label: 'Storage Location'} ],
+  identification: [{ position: 100 , label: 'Storage Location'}]
+    }
+  lgort;
+  @UI:{lineItem: [{position: 110,importance: #HIGH , label: 'Quantity'} ],
+  identification: [{ position: 110 , label: 'Quantity'}]
+    }
+  kwmeng;
+  @UI:{lineItem: [{position: 120,importance: #HIGH , label: 'UoM'} ],
+  identification: [{ position: 120 , label: 'UoM'}]
+    }
+  vrkme;
+  //  @UI.hidden: true
+  //  _User;
+}

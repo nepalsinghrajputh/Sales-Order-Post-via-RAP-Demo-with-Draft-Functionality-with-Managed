@@ -1,0 +1,43 @@
+@AbapCatalog.viewEnhancementCategory: [#NONE]
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'Comsumpition View for User data so'
+@Metadata.ignorePropagatedAnnotations: true
+@ObjectModel.usageType:{
+    serviceQuality: #X,
+    sizeCategory: #S,
+    dataClass: #MIXED
+}
+@Metadata.allowExtensions: true
+define root view entity ZC_FILE_DATA_SO
+  provider contract transactional_query
+  as projection on ZI_FILE_DATA_SO
+{
+  key uuid,
+      vbeln,
+      descripition,
+      @Semantics.largeObject : {
+      mimeType: 'mimetype',
+      fileName: 'filename',
+      acceptableMimeTypes: [ 'application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
+      contentDispositionPreference: #ATTACHMENT
+      }
+      attachment,
+      @Semantics.mimeType: true
+      mimetype,
+      filename,
+      file_status,
+      template_status,
+      Criticality,
+      SalesOrderCriticality,
+      TemplateCrticality,
+      ShowPDF,
+      LinkToPDF,
+      local_created_by,
+      local_created_at,
+      local_last_changed_by,
+      local_last_changed_at,
+      last_changed_at,
+      /* Associations */
+      _UserSo : redirected to composition child ZC_FILE_DT_SO,
+      _SOLog  : redirected to composition child ZC_SO_LOG
+}

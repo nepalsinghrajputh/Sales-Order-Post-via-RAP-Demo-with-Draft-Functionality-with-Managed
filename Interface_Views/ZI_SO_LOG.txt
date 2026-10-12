@@ -1,0 +1,36 @@
+@AbapCatalog.viewEnhancementCategory: [#NONE]
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'Interface View for SO Log'
+define view entity ZI_SO_LOG
+  as select from zsdt_so_log
+  association to parent ZI_FILE_DATA_SO as _User on $projection.Uuid = _User.uuid
+{
+  key uuid                  as Uuid,
+  key itemuuid              as Itemuuid,
+      type                  as Type,
+      msg                   as Msg,
+      case type
+      when 'E' then 1
+      when 'S' then 3
+      else 0
+      end                   as Msgcr,
+      //      case type
+      //        when 'S' then 'sap-icon://status-positive'
+      //        when 'W' then 'sap-icon://status-critical'
+      //        when 'E' then 'sap-icon://status-negative'
+      //        when 'A' then 'sap-icon://message-error'
+      //        when 'I' then 'sap-icon://message-information'
+      //        else 'sap-icon://question-mark'
+      //      end                   as StatusIcon,
+      @Semantics.user.createdBy: true
+      local_created_by      as LocalCreatedBy,
+      @Semantics.systemDateTime.createdAt: true
+      local_created_at      as LocalCreatedAt,
+      @Semantics.user.lastChangedBy: true
+      local_last_changed_by as LocalLastChangedBy,
+      @Semantics.systemDateTime.localInstanceLastChangedAt: true
+      local_last_changed_at as LocalLastChangedAt,
+      @Semantics.systemDateTime.lastChangedAt: true
+      last_changed_at       as LastChangedAt,
+      _User
+}

@@ -1,0 +1,28 @@
+@AbapCatalog.viewEnhancementCategory: [#NONE]
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'File Sales Order Details'
+@Metadata.ignorePropagatedAnnotations: true
+@ObjectModel.usageType:{
+    serviceQuality: #X,
+    sizeCategory: #S,
+    dataClass: #MIXED
+}
+define view entity ZI_FILE_DT_SO 
+as select from zsdt_sales_ord
+ association to parent ZI_FILE_DATA_SO  as _User on  $projection.uuid = _User.uuid
+{
+    key uuid,
+    key serialno,
+    auart,
+    kunnr,
+    vkorg,
+    vtweg,
+    spart,
+    matnr,
+    werks,
+    lgort,
+    @Semantics.quantity.unitOfMeasure : 'vrkme'
+    kwmeng,
+    vrkme,
+    _User
+}

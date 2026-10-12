@@ -1,0 +1,24 @@
+@EndUserText.label : 'Draft Table for Sales Order Details'
+@AbapCatalog.enhancement.category : #NOT_EXTENSIBLE
+@AbapCatalog.tableCategory : #TRANSPARENT
+@AbapCatalog.deliveryClass : #A
+@AbapCatalog.dataMaintenance : #RESTRICTED
+define table zsdt_sales_ord_d {
+
+  key client   : abap.clnt not null;
+  key uuid     : sysuuid_x16 not null;
+  key serialno : abap.int4 not null;
+  auart        : auart;
+  kunnr        : kunag;
+  vkorg        : vkorg;
+  vtweg        : vtweg;
+  spart        : spart;
+  matnr        : matnr;
+  werks        : werks_d;
+  lgort        : lgort_d;
+  @Semantics.quantity.unitOfMeasure : 'zsdt_sales_ord_d.vrkme'
+  kwmeng       : kwmeng;
+  vrkme        : vrkme;
+  "%admin"     : include sych_bdl_draft_admin_inc;
+
+}

@@ -1,0 +1,29 @@
+@AbapCatalog.viewEnhancementCategory: [#NONE]
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'Comsumpition View for User data so'
+@Metadata.ignorePropagatedAnnotations: true
+@ObjectModel.usageType:{
+    serviceQuality: #X,
+    sizeCategory: #S,
+    dataClass: #MIXED
+}
+@Metadata.allowExtensions: true
+define view entity ZC_FILE_DT_SO 
+as projection on ZI_FILE_DT_SO
+{
+    key uuid,
+    key serialno,
+    auart,
+    kunnr,
+    vkorg,
+    vtweg,
+    spart,
+    matnr,
+    werks,
+    lgort,
+    @Semantics.quantity.unitOfMeasure : 'vrkme'
+    kwmeng,
+    vrkme,
+    /* Associations */
+    _User : redirected to parent ZC_FILE_DATA_SO
+}

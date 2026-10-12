@@ -1,0 +1,20 @@
+@EndUserText.label : 'Sales Order Log'
+@AbapCatalog.enhancement.category : #NOT_EXTENSIBLE
+@AbapCatalog.tableCategory : #TRANSPARENT
+@AbapCatalog.deliveryClass : #A
+@AbapCatalog.dataMaintenance : #RESTRICTED
+define table zsdt_so_log {
+
+  key client            : abap.clnt not null;
+  key uuid              : sysuuid_x16 not null;
+  key itemuuid          : sysuuid_x16 not null;
+  type                  : abap.char(3);
+  msg                   : abap.char(255);
+  msgcr                 : abap.int1;
+  local_created_by      : abp_creation_user;
+  local_created_at      : abp_creation_tstmpl;
+  local_last_changed_by : abp_locinst_lastchange_user;
+  local_last_changed_at : abp_locinst_lastchange_tstmpl;
+  last_changed_at       : abp_lastchange_tstmpl;
+
+}

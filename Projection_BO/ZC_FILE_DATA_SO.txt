@@ -1,0 +1,33 @@
+projection;
+strict ( 2 );
+use draft;
+use side effects;
+define behavior for ZC_FILE_DATA_SO alias User
+{
+  use create;
+  use update;
+  use delete;
+  use action PostSO;
+  use action uploadExcelData;
+  use action DownloadExcel;
+  use action Activate;
+  use action Discard;
+  use action Edit;
+  use action Resume;
+  use action Prepare;
+  use association _UserSo { create; with draft; }
+  use association _SOLog { create; with draft; }
+//  use side effects;
+}
+define behavior for ZC_FILE_DT_SO alias UserSo
+{
+  use update;
+  use delete;
+  use association _User { with draft; }
+}
+define behavior for ZC_SO_LOG alias SOLog
+{
+  use update;
+  use delete;
+  use association _User { with draft; }
+}

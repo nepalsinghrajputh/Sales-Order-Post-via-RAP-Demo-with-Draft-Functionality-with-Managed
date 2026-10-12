@@ -1,0 +1,21 @@
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'Composition View for LoG'
+//@Metadata.ignorePropagatedAnnotations: true
+@Metadata.allowExtensions: true
+define view entity ZC_SO_LOG
+as projection on ZI_SO_LOG
+{
+    key Uuid,
+    key Itemuuid,
+    Type,
+    Msg,
+    Msgcr,
+//    StatusIcon,
+    LocalCreatedBy,
+    LocalCreatedAt,
+    LocalLastChangedBy,
+    LocalLastChangedAt,
+    LastChangedAt,
+    /* Associations */
+    _User : redirected to parent ZC_FILE_DATA_SO
+}

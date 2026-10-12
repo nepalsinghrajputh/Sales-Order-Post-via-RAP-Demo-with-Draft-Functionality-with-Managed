@@ -1,0 +1,155 @@
+@Metadata.layer: #CORE
+@UI.headerInfo:{
+typeName: 'User Data',
+typeNamePlural: 'User Data',
+title:{
+   type: #STANDARD,
+   value: 'uuid' },
+   description:{ label: 'UUID' }
+
+    }
+annotate entity ZC_FILE_DATA_SO with
+{
+  @UI.facet: [
+    {
+  purpose: #HEADER,
+    type: #DATAPOINT_REFERENCE,
+    position: 9,
+    targetQualifier: 'SalesOrder'
+
+  },
+  {
+  purpose: #HEADER,
+    type: #DATAPOINT_REFERENCE,
+    position: 10,
+    targetQualifier: 'description'
+
+  },
+    {
+  purpose: #HEADER,
+    type: #DATAPOINT_REFERENCE,
+    position: 20,
+    targetQualifier: 'fileStatus'
+
+  },
+     {
+  purpose: #HEADER,
+    type: #DATAPOINT_REFERENCE,
+    position: 25,
+    targetQualifier: 'templateStatus'
+
+  },
+      {
+  purpose: #HEADER,
+    type: #DATAPOINT_REFERENCE,
+    position: 30,
+    targetQualifier: 'fileChanged'
+
+  },
+  {
+  // this is a collection facet
+   purpose: #STANDARD,
+   type: #COLLECTION ,
+   label: 'General Info',
+   position: 10,
+   id : 'idBasic'
+  },
+  {
+  purpose: #STANDARD,
+  type: #IDENTIFICATION_REFERENCE ,
+  label: 'User Info',
+  position: 10,
+  id : 'idUser',
+  parentId: 'idBasic'
+  },
+  {
+  purpose: #STANDARD,
+  type: #FIELDGROUP_REFERENCE ,
+  label: 'Log Details',
+  position: 20,
+  id : 'idlogs',
+  parentId: 'idBasic',
+  targetQualifier: 'logs'
+  },
+  {
+  purpose: #STANDARD,
+  type: #LINEITEM_REFERENCE ,
+  label: 'Excel file data',
+  position: 20,
+  id : 'USO',
+  targetElement: '_UserSo'
+  },
+    {
+  purpose: #STANDARD,
+  type: #LINEITEM_REFERENCE ,
+  label: 'Sales Order Log',
+  position: 30,
+  id : 'ULOG',
+  targetElement: '_SOLog'
+  }
+  ]
+
+  @UI:{lineItem: [{position: 10,importance: #HIGH , label: 'UUID', cssDefault.width: '80px'},
+                  { type:#FOR_ACTION, label : 'Post Sales Order',dataAction: 'PostSO',invocationGrouping: #ISOLATED } ],
+                  identification: [{ type: #FOR_ACTION, label: 'Upload Data', dataAction: 'uploadExcelData'  },
+                                  { type: #FOR_ACTION, label: 'Download Excel', dataAction: 'DownloadExcel' },
+                { position: 10,  label: 'UUID' }],
+                selectionField: [{ position: 10}]
+    }
+  @EndUserText.label: 'UUID'
+  uuid;
+  @UI:{lineItem: [{position: 20,importance: #HIGH , label: 'Description',cssDefault.width: '130px'} ],
+        dataPoint :{ qualifier: 'description' , title: 'Description'},
+       identification: [{ position: 20 , label: 'Description'}]
+  }
+  descripition;
+  @UI:{
+    lineItem: [{
+      position: 21,
+      importance: #HIGH,
+      label: 'Sales Order',
+      cssDefault.width: '80px',
+      criticality: 'SalesOrderCriticality'
+    }],
+    dataPoint:{
+      qualifier: 'SalesOrder',
+      title: 'Sales Order',
+      criticality: 'SalesOrderCriticality'
+    },
+    identification:[{
+      position: 21,
+      label: 'Sales Order'
+    }]
+  }
+  vbeln;
+  @UI.identification: [{ position: 40 , label: 'Choose Excel File'}]
+  attachment;
+  @UI:{lineItem: [{position: 40,importance: #HIGH , label: 'Excel Filename',cssDefault.width: '140px'} ]}
+  filename;
+  @UI.lineItem: [{
+    position: 55,
+    label: 'PDF',
+    type: #WITH_URL,
+    url: 'LinkToPDF'
+  }]
+  ShowPDF;
+
+  @UI.hidden: true
+  LinkToPDF;
+  //  @UI:{ lineItem: [{position: 55,importance: #HIGH , label: 'Template Status', criticality: 'TemplateCrticality' , cssDefault.width: '150px'} ]
+  //   ,
+  @UI.dataPoint :{ qualifier: 'templateStatus' , title: 'Template Status',criticality: 'TemplateCrticality'}
+  template_status;
+  @UI:{lineItem: [{position: 50,importance: #HIGH , label: 'File Status', criticality: 'Criticality',cssDefault.width: '170px'} ] ,
+   dataPoint :{ qualifier: 'fileStatus' , title: 'File Status',criticality: 'Criticality'}}
+  file_status;
+  @UI:{lineItem: [{position: 60,importance: #HIGH , label: 'Last Changed At'} ],
+  fieldGroup: [{ qualifier: 'logs', label: 'Last Changed At' , position: 20 }],
+  dataPoint :{ qualifier: 'fileChanged' , title: 'Last Changed At'} }
+  last_changed_at;
+  @UI:{lineItem: [{position: 70,importance: #HIGH , label: 'Created By'} ],
+  fieldGroup: [{ qualifier: 'logs', label: 'Created By' , position: 10 }] }
+  local_created_by;
+  //  @UI.hidden: true
+  //  _UserSo;
+}

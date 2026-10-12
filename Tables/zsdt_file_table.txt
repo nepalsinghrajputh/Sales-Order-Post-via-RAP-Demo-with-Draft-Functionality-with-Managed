@@ -1,0 +1,28 @@
+@EndUserText.label : 'Files table for Sales Order'
+@AbapCatalog.enhancement.category : #NOT_EXTENSIBLE
+@AbapCatalog.tableCategory : #TRANSPARENT
+@AbapCatalog.deliveryClass : #A
+@AbapCatalog.dataMaintenance : #RESTRICTED
+define table zsdt_file_table {
+
+  key client            : abap.clnt not null;
+  key uuid              : sysuuid_x16 not null;
+  vbeln                 : vbeln;
+  descripition          : abap.char(100);
+  attachment            : abap.rawstring(0);
+  mimetype              : abap.char(128);
+  filename              : abap.char(128);
+  file_status           : abap.char(50);
+  criticality           : abap.int1;
+  salesordercriticality : abap.int1;
+  templatecrticality    : abap.int1;
+  template_status       : abap.char(50);
+  showpdf               : abap.char(50);
+  linktopdf             : abap.char(300);
+  local_created_by      : abp_creation_user;
+  local_created_at      : abp_creation_tstmpl;
+  local_last_changed_by : abp_locinst_lastchange_user;
+  local_last_changed_at : abp_locinst_lastchange_tstmpl;
+  last_changed_at       : abp_lastchange_tstmpl;
+
+}

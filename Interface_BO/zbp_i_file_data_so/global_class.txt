@@ -1,0 +1,32 @@
+CLASS zbp_i_file_data_so DEFINITION PUBLIC ABSTRACT FINAL FOR BEHAVIOR OF zi_file_data_so.
+  PUBLIC SECTION.
+    TYPES: BEGIN OF ty_exl_file,
+             auart     TYPE string,
+             kunnr     TYPE string,
+             vkorg     TYPE string,
+             vtweg     TYPE string,
+             spart     TYPE string,
+             matnr     TYPE string,
+             werks     TYPE string,
+             lgort     TYPE string,
+             kwmeng    TYPE string,
+             vrkme     TYPE string,
+             serial_no TYPE string,
+           END OF ty_exl_file.
+    TYPES: BEGIN OF ty_main,
+             auart     TYPE auart,
+             kunnr     TYPE kunag,
+             vkorg     TYPE vkorg,
+             vtweg     TYPE vtweg,
+             spart     TYPE spart,
+             matnr     TYPE matnr,
+             werks     TYPE werks_d,
+             lgort     TYPE lgort_d,
+             kwmeng    TYPE kwmeng,
+             vrkme     TYPE vrkme,
+             serial_no TYPE i,
+           END OF ty_main.
+ENDCLASS.
+
+CLASS zbp_i_file_data_so IMPLEMENTATION.
+ENDCLASS.

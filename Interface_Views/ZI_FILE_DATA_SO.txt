@@ -1,0 +1,57 @@
+@AbapCatalog.viewEnhancementCategory: [#NONE]
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'File data for Sales Order'
+@Metadata.ignorePropagatedAnnotations: true
+@ObjectModel.usageType:{
+    serviceQuality: #X,
+    sizeCategory: #S,
+    dataClass: #MIXED
+}
+define root view entity ZI_FILE_DATA_SO
+  as select from zsdt_file_table
+  composition [0..*] of ZI_FILE_DT_SO as _UserSo
+  composition [0..*] of ZI_SO_LOG     as _SOLog
+{
+  key uuid,
+      vbeln,
+      descripition,
+      attachment,
+      @Semantics.mimeType: true
+      mimetype,
+      filename,
+      file_status,
+      template_status,
+      case vbeln
+      when '' then 0
+      else 3
+      end       as SalesOrderCriticality,
+      case file_status
+        when 'File Selected' then 2
+        when 'Excel Uploaded' then 3
+        when 'File not Selected' then 1
+        when 'Posted'  then 3
+        else 0
+        end     as Criticality,
+      case template_status
+            when 'Present' then 3
+            when 'Absent'  then 1
+            else 0
+            end as TemplateCrticality,
+      //      'Preview(SEGW)'                     as ShowPDF,
+      //      concat('/sap/opu/odata/sap/ZRAP_SM_SER_SRV/SM_DISPLAYSet(''',
+      //             concat(vbeln, ''')/$value')) as LinkToPDF,
+      showpdf,
+      linktopdf,
+      @Semantics.user.createdBy: true
+      local_created_by,
+      @Semantics.systemDateTime.createdAt: true
+      local_created_at,
+      @Semantics.user.lastChangedBy: true
+      local_last_changed_by,
+      @Semantics.systemDateTime.localInstanceLastChangedAt: true
+      local_last_changed_at,
+      @Semantics.systemDateTime.lastChangedAt: true
+      last_changed_at,
+      _UserSo,
+      _SOLog
+}
