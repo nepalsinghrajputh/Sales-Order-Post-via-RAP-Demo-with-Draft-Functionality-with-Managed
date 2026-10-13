@@ -1,0 +1,209 @@
+CLASS zrap_parallel_process_so DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+
+    INTERFACES if_serializable_object .
+    INTERFACES if_abap_parallel .
+    TYPES: BEGIN OF ty_item,
+             auart  TYPE auart,
+             kunnr  TYPE kunag,
+             vkorg  TYPE vkorg,
+             vtweg  TYPE vtweg,
+             spart  TYPE spart,
+             matnr  TYPE matnr,
+             werks  TYPE werks_d,
+             lgort  TYPE lgort_d,
+             kwmeng TYPE kwmeng,
+             vrkme  TYPE vrkme,
+           END OF ty_item.
+    TYPES: BEGIN OF ty_msg,
+             type(1)  TYPE c,
+             msg(225) TYPE c,
+           END OF ty_msg.
+
+    TYPES tt_item TYPE STANDARD TABLE OF ty_item WITH EMPTY KEY.
+    TYPES tt_msg TYPE STANDARD TABLE OF  ty_msg WITH EMPTY KEY.
+    METHODS constructor
+      IMPORTING
+        it_items TYPE tt_item.
+
+
+    METHODS get_result
+      EXPORTING
+        ev_vbeln TYPE vbeln_va
+        et_msgs  TYPE tt_msg.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+    DATA mt_items TYPE tt_item.
+    DATA mt_msgs TYPE tt_msg.
+    DATA mv_vbeln TYPE vbeln_va.
+ENDCLASS.
+
+
+
+CLASS zrap_parallel_process_so IMPLEMENTATION.
+  METHOD constructor.
+    mt_items = it_items.
+  ENDMETHOD.
+  METHOD get_result.
+    ev_vbeln = mv_vbeln.
+    et_msgs  = mt_msgs.
+  ENDMETHOD.
+  METHOD if_abap_parallel~do.
+    DATA: ls_order_header_in     TYPE  bapisdhd1,
+          salesdocument          TYPE  bapivbeln-vbeln,
+          ls_order_header_inx    TYPE  bapisdhd1x,
+          ls_return              TYPE  bapiret2,
+          lt_return              TYPE TABLE OF  bapiret2,
+          ls_order_items_in      TYPE  bapisditm,
+          ls_order_items_inx     TYPE  bapisditmx,
+          ls_order_partners      TYPE  bapiparnr,
+          ls_order_schedules_in  TYPE  bapischdl,
+          ls_order_schedules_inx TYPE  bapischdlx,
+          ls_order_partners_out  TYPE  bapisdpart,
+          ls_sales_documents     TYPE  sales_key,
+          lt_order_header_in     TYPE TABLE OF  bapisdhd1,
+          lt_order_header_inx    TYPE TABLE OF  bapisdhd1x,
+          lt_order_items_in      TYPE TABLE OF  bapisditm,
+          lt_order_items_inx     TYPE TABLE OF  bapisditmx,
+          lt_order_partners      TYPE TABLE OF  bapiparnr,
+          lt_order_schedules_in  TYPE TABLE OF  bapischdl,
+          lt_order_schedules_inx TYPE TABLE OF  bapischdlx.
+    IF mt_items IS NOT INITIAL.
+      "Fill Header Details
+      READ TABLE mt_items ASSIGNING FIELD-SYMBOL(<lfs_header>) INDEX 1.
+      IF sy-subrc = 0.
+        "Sales Order Document Type
+        ls_order_header_inx-updateflag = 'I'.
+        ls_order_header_in-doc_type     = <lfs_header>-auart.
+        IF ls_order_header_in-doc_type IS NOT INITIAL.
+          ls_order_header_inx-doc_type = abap_true.
+        ENDIF.
+        ls_order_header_in-sales_org    = <lfs_header>-vkorg.
+        IF ls_order_header_in-sales_org IS NOT INITIAL.
+          ls_order_header_inx-sales_org = abap_true.
+        ENDIF.
+        ls_order_header_in-distr_chan   = <lfs_header>-vtweg.
+        IF ls_order_header_in-distr_chan IS NOT INITIAL.
+          ls_order_header_inx-distr_chan = abap_true.
+        ENDIF.
+        ls_order_header_in-division     = <lfs_header>-spart.
+        IF ls_order_header_in-division IS NOT INITIAL.
+          ls_order_header_inx-division = abap_true.
+        ENDIF.
+        ls_order_header_in-purch_date   =  sy-datum.
+        IF ls_order_header_in-purch_date IS NOT INITIAL.
+          ls_order_header_inx-purch_date = abap_true.
+        ENDIF.
+        ls_order_header_in-currency     =  'NGN'.
+        IF ls_order_header_in-currency IS NOT INITIAL.
+          ls_order_header_inx-currency = abap_true.
+        ENDIF.
+        ls_order_partners-partn_role = 'AG'.
+        ls_order_partners-partn_numb = |{ <lfs_header>-kunnr ALPHA = IN }|.
+        APPEND ls_order_partners TO lt_order_partners.
+        CLEAR:ls_order_partners.
+
+        ls_order_partners-partn_role = 'RG'.
+        ls_order_partners-partn_numb = |{ <lfs_header>-kunnr ALPHA = IN }|.
+        APPEND ls_order_partners TO lt_order_partners.
+        CLEAR:ls_order_partners.
+
+        ls_order_partners-partn_role = 'RE'.
+        ls_order_partners-partn_numb = |{ <lfs_header>-kunnr ALPHA = IN }|.
+        APPEND ls_order_partners TO lt_order_partners.
+        CLEAR:ls_order_partners.
+
+        ls_order_partners-partn_role = 'WE'.
+        ls_order_partners-partn_numb = |{ <lfs_header>-kunnr ALPHA = IN }|.
+        APPEND ls_order_partners TO lt_order_partners.
+        CLEAR:ls_order_partners.
+      ENDIF.
+      DATA(lv_posnr) = VALUE posnr(  ).
+      DATA(lv_no) = VALUE i(  ).
+      LOOP AT mt_items ASSIGNING FIELD-SYMBOL(<lfs_item>).
+        CLEAR:ls_order_items_in,ls_order_items_inx,ls_order_schedules_in,ls_order_schedules_inx.
+
+        lv_posnr = lv_posnr + 10.
+        lv_no    = lv_no + 1.
+        ls_order_items_in-itm_number      = lv_posnr.
+        ls_order_items_inx-itm_number     = lv_posnr.
+        ls_order_items_inx-updateflag     = 'I'.
+
+        ls_order_items_in-material       = <lfs_item>-matnr.
+        IF ls_order_items_in-material IS NOT INITIAL.
+          ls_order_items_inx-material = abap_true.
+        ENDIF.
+        ls_order_items_in-plant          = <lfs_item>-werks.
+        IF ls_order_items_in-plant IS NOT INITIAL.
+          ls_order_items_inx-plant = abap_true.
+        ENDIF.
+        ls_order_items_in-store_loc      = <lfs_item>-lgort.
+        IF ls_order_items_in-store_loc  IS NOT INITIAL.
+          ls_order_items_inx-store_loc = abap_true.
+        ENDIF.
+        ls_order_items_in-target_qty     = <lfs_item>-kwmeng.
+        IF ls_order_items_in-target_qty IS NOT INITIAL.
+          ls_order_items_inx-target_qty = abap_true.
+        ENDIF.
+        ls_order_items_in-target_qu      = <lfs_item>-vrkme.
+        IF ls_order_items_in-target_qu IS NOT INITIAL.
+          ls_order_items_inx-target_qu = abap_true.
+        ENDIF.
+
+        ls_order_schedules_in-itm_number = lv_posnr.
+        ls_order_schedules_inx-itm_number = lv_posnr.
+        ls_order_schedules_in-sched_line = lv_no.
+        ls_order_schedules_inx-sched_line = lv_no.
+
+        ls_order_schedules_inx-updateflag = 'I'.
+
+        ls_order_schedules_in-req_qty = <lfs_item>-kwmeng.
+        IF ls_order_schedules_in-req_qty IS NOT INITIAL.
+          ls_order_schedules_inx-req_qty = abap_true.
+        ENDIF.
+
+        APPEND  ls_order_items_in      TO lt_order_items_in.
+        APPEND  ls_order_items_inx     TO lt_order_items_inx.
+        APPEND  ls_order_schedules_in  TO lt_order_schedules_in.
+        APPEND  ls_order_schedules_inx TO lt_order_schedules_inx.
+      ENDLOOP.
+      TRY.
+          CALL FUNCTION 'BAPI_SALESORDER_CREATEFROMDAT2'   "#EC CI_USAGE_OK[2438131]
+            EXPORTING
+              order_header_in     = ls_order_header_in
+              order_header_inx    = ls_order_header_inx
+            IMPORTING
+              salesdocument       = salesdocument
+            TABLES
+              return              = lt_return
+              order_items_in      = lt_order_items_in
+              order_items_inx     = lt_order_items_inx
+              order_partners      = lt_order_partners
+              order_schedules_in  = lt_order_schedules_in
+              order_schedules_inx = lt_order_schedules_inx.
+        CATCH cx_root INTO DATA(ls_root).
+      ENDTRY.
+      IF salesdocument IS NOT INITIAL.
+        mv_vbeln = salesdocument.
+        CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'
+          EXPORTING
+            wait = abap_true.
+        DATA(ls_msg1) = VALUE ty_msg(  ).
+        ls_msg1-type  = 'S'.
+        ls_msg1-msg   = |Sales Order Created :{ salesdocument Alpha = out } Successfully|.
+        APPEND ls_msg1 TO mt_msgs.
+      ELSE.
+        LOOP AT lt_return ASSIGNING FIELD-SYMBOL(<lfs_return>).
+          DATA(ls_msg) = VALUE ty_msg(  ).
+          ls_msg-type  = <lfs_return>-type.
+          ls_msg-msg   = <lfs_return>-message.
+          APPEND ls_msg TO mt_msgs.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
+  ENDMETHOD.
+ENDCLASS.
